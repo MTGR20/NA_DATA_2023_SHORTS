@@ -69,9 +69,9 @@ public class readData {
     }
 
 
-    public static List<Map<String, String>> readArticle(URL url) throws IOException, ParseException {
+    public static List<JSONObject> readArticle(URL url) throws IOException, ParseException {
 
-        List<Map<String, String>> articleList = new ArrayList<>();
+        List<JSONObject> articleList = new ArrayList<>();
 
         String result = connectURL(url, "GET");
 
@@ -86,6 +86,7 @@ public class readData {
         //System.out.println(rowArray);
 
         int rowSize = rowArray.size();
+
         for (int i = 0; i < rowSize; i++) {
 
             JSONObject rowObject = (JSONObject) rowArray.get(i);
@@ -105,8 +106,9 @@ public class readData {
                 content = contentUrl.toString();
             }
 
-            Map<String, String> temp = new HashMap<>();
-            temp.put(title, content);
+            JSONObject temp = new JSONObject();
+            temp.put("TITLE", title);
+            temp.put("CONTENT", content);
             articleList.add(temp);
         }
 

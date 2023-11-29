@@ -19,19 +19,18 @@ public class setting {
     private static String VALUE = "&AGE=21";
     private static boolean ARTICLE_TRUE = false;
 
-
     private static final int SUMMARY_LENGTH = 3; //3줄 요약
     private static final String LANGUAGE = "ko";
-    private static final String CONTENT_TYPE = "application/json";
+    private static final String CONTENT_TYPE = "application/json;UTF-8";
 
     private static String MODEL = "general";
-    private static JSONArray DATA;
+    private static String DATA;
 
     public String getModel() {
         return MODEL;
     }
 
-    public void setModel(boolean is_news) {
+    public static void setModel(boolean is_news) {
         if (is_news){
             MODEL = "news";
         }
@@ -41,24 +40,16 @@ public class setting {
     }
 
     public static void setData(String title, String content) {
-        JSONArray data = new JSONArray();
 
-        JSONObject document = new JSONObject();
-        document.put("title", title);
-        document.put("content", content);
-
-        JSONObject option = new JSONObject();
-        option.put("language", LANGUAGE);
-        option.put("model", MODEL);
-        option.put("summaryCount", SUMMARY_LENGTH);
-
-        data.add(document);
-        data.add(option);
+        String data = "{ \"document\": " +
+                "{ \"title\": \"" + title + "\", \"content\": \"" + content +"\" }, " +
+                  "\"option\": { \"language\": \"" + LANGUAGE + "\", \"model\": \"" + MODEL + "\", \"summaryCount\": \"" + SUMMARY_LENGTH + "\" } }";
 
         DATA = data;
+
     }
 
-    public static JSONArray getData() {
+    public static String getData() {
         return DATA;
     }
 

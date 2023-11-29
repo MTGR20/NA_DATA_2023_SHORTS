@@ -1,3 +1,5 @@
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.BufferedReader;
@@ -73,42 +75,36 @@ public class shorts {
         //read article
         if (setting.isArticleTrue()) {
 
-            System.out.println("isArticleTrue");
-
             String article_date = localDate;
             StringBuilder write_date = new StringBuilder();
             String value = write_date.append("&WRITE_DATE='").append(article_date).append("'").toString();
+
             setting.setApiUrl(setting.getArticle());
             setting.setValue(value, true);
 
             URL api_url = new URL(setting.getUrlWithType(true));
-            List<Map<String, String>> articleList = readData.readArticle(api_url);
-//            for (String content : contentList) {
-//                System.out.println(content);
-//                System.out.println();
-//            }
 
-            //TODO: FIX ERROR
+            List<JSONObject> articleList = readData.readArticle(api_url);
+            JSONObject chosen_article = articleList.get(0); // temp
+
+            String chosen_title = (String) chosen_article.get("TITLE");
+            String chosen_content = (String) chosen_article.get("CONTENT");
+
             //gen ai와 연동해서 답변을 가져오면 됨!
-            Map<String, String> chosen_article = articleList.get(0); // temp
-            String chosen_title = chosen_article.get("title");
-            String chosen_content = chosen_article.get("content");
-
-//            StringBuilder message = new StringBuilder();
-//            message.append("다음 기사의 핵심 내용을 뽑고 그걸 짧은 세 문장으로 요약해줘. 시각 장애인에게 기사를 요약해 읽어주는 서비스에 사용될거야.\n")
-//                    .append(chosen_article.get("content"));
-
+            //summary
             String answer = "";
 
             URL clova_url = new URL("https://naveropenapi.apigw.ntruss.com/text-summary/v1/summarize");
             HttpURLConnection con = (HttpURLConnection) clova_url.openConnection();
             con.setRequestMethod("POST");
-
-            setting.setData(chosen_title, chosen_content);
-            String requestBody = setting.getData().toJSONString();
+            con.setRequestProperty("Accept", setting.getContentType());
             con.setRequestProperty("Content-Type", setting.getContentType());
             con.setRequestProperty("X-NCP-APIGW-API-KEY-ID", setting.getClientId());
             con.setRequestProperty("X-NCP-APIGW-API-KEY", setting.getClientSecretKey());
+
+            setting.setModel(true);
+            setting.setData(chosen_title, chosen_content);
+            String requestBody = setting.getData();
 
             con.setDoOutput(true);
             DataOutputStream wr = new DataOutputStream(con.getOutputStream());
@@ -126,7 +122,17 @@ public class shorts {
                     answer = decodedString;
                 }
                 bufferedReader.close();
+
+                JSONParser jsonParser = new JSONParser();
+                JSONObject jsonObject = (JSONObject) jsonParser.parse(answer);
+                answer = (String) jsonObject.get("summary");
                 System.out.println(answer);
+
+                //chatbot (추가 기능)
+//            StringBuilder message = new StringBuilder();
+//            message.append("다음 세 문장을 짧은 세 문장으로 요약해줘. 시각 장애인에게 기사를 요약해 읽어주는 서비스에 사용할 것이라서 짧고 핵심적인 내용이 필요해.\n")
+//                    .append(chosen_article.get("content"));
+
 
             } else {
                 bufferedReader = new BufferedReader(new InputStreamReader(con.getErrorStream()));
@@ -135,10 +141,11 @@ public class shorts {
 
         }
 
+        // article 후에 다른 데이터도 쇼츠
         // 선택된 데이터 타입에 따라 가져오기
         int idx = updated_idxList.get(data_type);
         List<String> chosen_api = apiList.get(idx);
-        System.out.println(chosen_api);
+        System.out.println("\n\n" + chosen_api);
 
     }
 
