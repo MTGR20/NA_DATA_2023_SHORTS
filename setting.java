@@ -1,0 +1,145 @@
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+public class setting {
+
+    //TODO: PRIVATE DATA
+    private static final String PATH= "path";
+    private static final String OPEN_API_KEY = "open api key";
+    private static final String CLIENT_ID = "clova client id";
+    private static final String CLIENT_SECRET_KEY = "clova client secret key";
+
+    //데이터 종류별 API URL (fixed = 보도기사, 서비스API)
+    private static final String OPEN_SRV_API = "https://open.assembly.go.kr/portal/openapi/OPENSRVAPI";
+    private static final String ARTICLE = "https://open.assembly.go.kr/portal/openapi/ninnagrlaelvtzfnt";
+    //private static final String PROPOSED_BILL = "https://open.assembly.go.kr/portal/openapi/nzmimeepazxkubdpn";
+    private static final String[] API_URL = new String[]{OPEN_SRV_API, ARTICLE};
+
+    //기능에 따라 변경해 사용
+    private static String CHOSEN_API_URL = ARTICLE;
+    private static String VALUE = "&AGE=21";
+    private static boolean ARTICLE_TRUE = false;
+
+
+    private static final int SUMMARY_LENGTH = 3; //3줄 요약
+    private static final String LANGUAGE = "ko";
+    private static final String CONTENT_TYPE = "application/json";
+
+    private static String MODEL = "general";
+    private static JSONArray DATA;
+
+    public String getModel() {
+        return MODEL;
+    }
+
+    public void setModel(boolean is_news) {
+        if (is_news){
+            MODEL = "news";
+        }
+        else{
+            MODEL = "general";
+        }
+    }
+
+    public static void setData(String title, String content) {
+        JSONArray data = new JSONArray();
+
+        JSONObject document = new JSONObject();
+        document.put("title", title);
+        document.put("content", content);
+
+        JSONObject option = new JSONObject();
+        option.put("language", LANGUAGE);
+        option.put("model", MODEL);
+        option.put("summaryCount", SUMMARY_LENGTH);
+
+        data.add(document);
+        data.add(option);
+
+        DATA = data;
+    }
+
+    public static JSONArray getData() {
+        return DATA;
+    }
+
+    public static String getClientSecretKey() {
+        return CLIENT_SECRET_KEY;
+    }
+
+    public static String getClientId() {
+        return CLIENT_ID;
+    }
+
+    public static String getContentType() {
+        return CONTENT_TYPE;
+    }
+
+    public static void setApiUrl(String api_url){
+        CHOSEN_API_URL = api_url;
+    }
+
+    public static void setApiUrl(int idx){
+        CHOSEN_API_URL = API_URL[idx];
+    }
+
+    public static String[] getFixedApiUrlType(){
+        return API_URL;
+    }
+
+    public static int getFixedApiUrlNum(){
+//        return API_URL.length;
+        return 1;
+    }
+
+    public static void setValue(String value, boolean age21_setTrue){ //"&a=b"이런 식으로만 받아오기
+        if (!age21_setTrue){
+            VALUE = value;
+        }
+        else{
+            VALUE = "&AGE=21" + value;
+        }
+    }
+
+    public static String getUrlWithType(boolean type_json_setTrue){
+        String Url = "";
+        if (!type_json_setTrue){
+            Url = CHOSEN_API_URL + "?KEY=" + OPEN_API_KEY + VALUE;
+        }
+        else {
+            Url = CHOSEN_API_URL + "?KEY=" + OPEN_API_KEY + "&Type=json" + VALUE;
+        }
+        return Url;
+    }
+
+    public static String getKey(){
+        return OPEN_API_KEY;
+    }
+
+    public static String getMyPath(){
+        return PATH;
+    }
+
+    public static String getArticle(){
+        return ARTICLE;
+    }
+
+    public static String getChosenApiUrl(){
+        return CHOSEN_API_URL;
+    }
+
+    public static String getValue(){
+        return VALUE;
+    }
+
+    public static String getOpenSrvApi(){
+        return OPEN_SRV_API;
+    }
+
+    public static boolean isArticleTrue() {
+        return ARTICLE_TRUE;
+    }
+
+    public static void setArticleTrue(boolean articleTrue) {
+        ARTICLE_TRUE = articleTrue;
+    }
+}
