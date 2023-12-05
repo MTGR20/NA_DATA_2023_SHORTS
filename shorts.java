@@ -77,9 +77,9 @@ public class shorts {
 
             String article_date = localDate;
             StringBuilder write_date = new StringBuilder();
-//            String value = write_date.append("&WRITE_DATE='").append(article_date).append("'").toString();
-            String test_date = "2023-12-05";
-            String value = write_date.append("&WRITE_DATE='").append(test_date).append("'").toString();
+            String value = write_date.append("&WRITE_DATE='").append(article_date).append("'").toString();
+//            String test_date = "2023-12-05";
+//            String value = write_date.append("&WRITE_DATE='").append(test_date).append("'").toString();
 
             setting.setApiUrl(setting.getArticle());
             setting.setValue(value, true);
