@@ -99,17 +99,21 @@ public class shorts {
 //            int check = 2^list_size;
 //            int chosen_idx_temp = rand.nextInt(articleList.size()); //자유롭게 변경
 //            System.out.println(articleList.size() + "개 중 " + (chosen_idx_temp + 1) + "번 째 기사");
-            JSONObject chosen_article = articleList.get(chosen_idx_temp);
-            summary = getSummary(chosen_article, true);
 
-            if (chosen_idx_temp + 1 < list_size) {
+            while (chosen_idx_temp + 1 < list_size) {
+                JSONObject chosen_article = articleList.get(chosen_idx_temp);
+                summary = getSummary(chosen_article, true);
                 chosen_idx_temp++;
-                System.out.println(chosen_idx_temp);
             }
-            else {
-                System.out.println("새롭게 업데이트된 기사가 없습니다.");
-                return;
-            }
+
+            System.out.println(list_size + "개의 기사 업데이트 완료\n");
+//            if (chosen_idx_temp + 1 < list_size) {
+//                chosen_idx_temp++;
+//                System.out.println(chosen_idx_temp);
+//            } else {
+//                System.out.println("새롭게 업데이트된 기사가 없습니다.");
+//                return;
+//            }
         }
 
         if (!summary.isEmpty()){
