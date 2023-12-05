@@ -69,7 +69,7 @@ public class readData {
     }
 
 
-    public static List<JSONObject> readArticle(URL url) throws IOException, ParseException {
+    public static Object readArticle(URL url) throws IOException, ParseException {
 
         List<JSONObject> articleList = new ArrayList<>();
 
@@ -78,6 +78,11 @@ public class readData {
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(result);
 
+//        System.out.println(jsonObject);
+        JSONObject check200 = (JSONObject) jsonObject.get("RESULT");
+        if (check200 != null && (check200.get("CODE").toString().equals("INFO-200"))) {
+            return null;
+        }
         JSONArray value = jsonObject2Array(jsonObject);
         //JSONObject head = (JSONObject) value.get(0);
         //List<Map<String, String>> headMapList = jsonArray2MapList(jsonObject2Array(head));
@@ -95,14 +100,18 @@ public class readData {
             String content = (String) rowObject.get("CONTENT");
             StringBuilder stringBuilder = new StringBuilder();
 
+//            System.out.println(rowObject);
+
             if (content != null) {
                 content = processSpecialSymbols(content);
                 content = content.replaceAll(REGEXP_PATTERN_HTML, "");
+                content = content.replace("\"", "'");
             }
             else{
                 URL contentUrl = new URL ((String) rowObject.get("CONTENT_URL"));
                 // buffer read 안되는 경우 ...
                 // 일단은 url만 리턴하도록 함
+                // 추후 이 Url 다시 다른 방법으로 읽어들여 내용 가져오기
                 content = contentUrl.toString();
             }
 
@@ -110,6 +119,7 @@ public class readData {
             temp.put("TITLE", title);
             temp.put("CONTENT", content);
             articleList.add(temp);
+
         }
 
         return articleList;
