@@ -15,6 +15,10 @@ import java.util.*;
 
 //import org.apache.http.impl.client.HttpClientBuilder;
 
+// shorts main 실행 시
+// 한 줄에 날짜(YYYY-MM-DD)를 작성하고
+// 다음 줄부터 당일 자료를 하나씩 세 줄 요약해서 "PATH/summary.txt"에 한 줄씩 입력
+
 public class shorts {
     public static void main(String[] args) throws IOException, ParseException, java.text.ParseException {
         /*
@@ -76,10 +80,11 @@ public class shorts {
         if (setting.isArticleTrue()) {
 
             String article_date = localDate;
+            String test_date = "2023-12-05";
+            String date = article_date;
+            //String date = test_date;
             StringBuilder write_date = new StringBuilder();
-            String value = write_date.append("&WRITE_DATE='").append(article_date).append("'").toString();
-//            String test_date = "2023-12-05";
-//            String value = write_date.append("&WRITE_DATE='").append(test_date).append("'").toString();
+            String value = write_date.append("&WRITE_DATE='").append(date).append("'").toString();
 
             setting.setApiUrl(setting.getArticle());
             setting.setValue(value, true);
@@ -100,9 +105,34 @@ public class shorts {
 //            int chosen_idx_temp = rand.nextInt(articleList.size()); //자유롭게 변경
 //            System.out.println(articleList.size() + "개 중 " + (chosen_idx_temp + 1) + "번 째 기사");
 
+            String path = setting.getMyPath() + "summary.txt";
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path, true));
+            bufferedWriter.write(date);
+            bufferedWriter.newLine();
+            bufferedWriter.close();
+
             while (chosen_idx_temp + 1 < list_size) {
                 JSONObject chosen_article = articleList.get(chosen_idx_temp);
                 summary = getSummary(chosen_article, true);
+
+                if (!summary.isEmpty()){
+                    System.out.println("[1차 요약]\n" + summary);
+
+                    //더 짧게 요약 (chatbot)
+                    String short_summary = getShortSummary(summary);
+                    System.out.println("[2차 요약]\n" + short_summary);
+
+                    /* vote (추가 기능) - method로 빼기
+                    // 취소: chat gpt가 기사 내용을 바탕으로 적절한 투표 선택지를 생성하지 X
+                    // summary 내용을 기반으로 선택지 2개? 3개?
+                    // 선택한 내용 저장 -> 기록 & 데이터 증강*/
+
+                    bufferedWriter = new BufferedWriter(new FileWriter(path, true));
+                    bufferedWriter.write(short_summary);
+                    bufferedWriter.newLine();
+                    bufferedWriter.close();
+                }
+
                 chosen_idx_temp++;
             }
 
@@ -114,25 +144,6 @@ public class shorts {
 //                System.out.println("새롭게 업데이트된 기사가 없습니다.");
 //                return;
 //            }
-        }
-
-        if (!summary.isEmpty()){
-            System.out.println("[1차 요약]\n" + summary);
-
-            //더 짧게 요약 (chatbot)
-            String short_summary = getShortSummary(summary);
-            System.out.println("[2차 요약]\n" + short_summary);
-
-            /* vote (추가 기능) - method로 빼기
-            // 취소: chat gpt가 기사 내용을 바탕으로 적절한 투표 선택지를 생성하지 X
-            // summary 내용을 기반으로 선택지 2개? 3개?
-            // 선택한 내용 저장 -> 기록 & 데이터 증강*/
-
-            String path = setting.getMyPath() + "summary.txt";
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path, true));
-            bufferedWriter.write(short_summary);
-            bufferedWriter.newLine();
-            bufferedWriter.close();
         }
 
         /*
