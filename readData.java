@@ -2,6 +2,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,10 +22,26 @@ public class readData {
     public static final String REGEXP_PATTERN_AMP_SEMICOLON = "&[^;];";
     private static final String INF = "99999999999";
 
+    public static String getReqSrvUrl(String str_url, boolean method_get) throws IOException {
+
+        Document document;
+        if (method_get){ document = Jsoup.connect(str_url).get();}
+        else { document = Jsoup.connect(str_url).post(); }
+
+        System.out.println(str_url);
+
+        Element item = document.select("#content > section.section_OpenAPI > div.box_A.OpenAPI_address > ul > li:nth-child(1) > span").get(0);
+//        Element item = document.select("#content > section.section_OpenAPI > div.box_A.OpenAPI_address > ul > li:nth-child(1)").get(0);
+//        Element item = document.select("#content > section.section_OpenAPI > div.box_A.OpenAPI_address > ul").get(0);
+
+        return "";
+    }
+
     public static String connectURL(URL url, String method) throws IOException {
 
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod(method);
+
         int responseCode = con.getResponseCode();
 
         BufferedReader bufferedReader;
@@ -32,7 +52,16 @@ public class readData {
             System.out.println(responseCode);
         }
 
-        return bufferedReader.readLine();
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = bufferedReader.readLine()) != null) {
+            sb.append(line);
+        }
+
+//        System.out.println(sb);
+
+        return sb.toString();
+//        return bufferedReader.readLine();
     }
 
     public static List<List<String>> readOpenSrvApi() throws IOException, ParseException {
@@ -63,9 +92,18 @@ public class readData {
                 value.add((String) ((JSONObject) temp).get(str));
             }
             apiList.add(value);
+            //System.out.println(value);
         }
 
+        //System.out.println(apiList.size());
+
         return apiList;
+    }
+
+    public static void readDefault(URL url) throws IOException {
+
+        String result = connectURL(url, "GET");
+
     }
 
 
@@ -78,7 +116,6 @@ public class readData {
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(result);
 
-//        System.out.println(jsonObject);
         JSONObject check200 = (JSONObject) jsonObject.get("RESULT");
         if (check200 != null && (check200.get("CODE").toString().equals("INFO-200"))) {
             return null;
@@ -88,7 +125,8 @@ public class readData {
         //List<Map<String, String>> headMapList = jsonArray2MapList(jsonObject2Array(head));
         JSONObject row = (JSONObject) value.get(1);
         JSONArray rowArray = jsonObject2Array(row);
-        //System.out.println(rowArray);
+
+//        System.out.println(rowArray);
 
         int rowSize = rowArray.size();
 
@@ -105,7 +143,9 @@ public class readData {
             if (content != null) {
                 content = processSpecialSymbols(content);
                 content = content.replaceAll(REGEXP_PATTERN_HTML, "");
+
                 content = content.replace("\"", "'");
+                title = title.replace("\"", "'");
             }
             else{
                 URL contentUrl = new URL ((String) rowObject.get("CONTENT_URL"));

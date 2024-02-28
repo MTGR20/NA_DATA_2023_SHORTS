@@ -3,17 +3,20 @@ import org.json.simple.JSONObject;
 public class setting {
 
     //TODO: PRIVATE DATA
-    private static final String PATH = "your path";
-    private static final String OPEN_API_KEY = "open api key";                  //OpenAPI
-    private static final String CHAT_BOT_KEY = "chat gpt key";                  //ChatGPT
-    private static final String CLIENT_ID = "clova Summary client id";          //CLOVA SUMMARY
-    private static final String CLIENT_SECRET_KEY = "clova Summary secret key"; //CLOVA SUMMARY
+    private static final String PATH = ""; //Local PATH
+    private static final String PATH_LANGCHAIN = ""; //LANGCHAIN Training Data PATH
+    private static final String OPEN_API_KEY = ""; //OpenAPI
+    private static final String CHAT_BOT_KEY = ""; //ChatGPT
+    private static final String CLIENT_ID = ""; //CLOVA SUMMARY
+    private static final String CLIENT_SECRET_KEY = ""; //CLOVA SUMMARY
+    private static final String TEXT_CORTEX_API_KEY = ""; //TextCortex SUMMARY
 
     // 기타 세팅
     private static final String CHAT_BOT_USER_ID = "test01"; //CLOVA CHAT
     private static final String CLOVA_SUMMARY_API_URL = "https://naveropenapi.apigw.ntruss.com/text-summary/v1/summarize";
     private static final String CLOVA_CHAT_BOT_API_URL = "https://ex9av8bv0e.apigw.ntruss.com/custom_chatbot/prod/";
     private static final String CHAT_BOT_END_POINT = "https://api.openai.com/v1/chat/completions"; //ChatGPT
+    private static final String TEXT_CORTEX_API_URL = "https://api.textcortex.com/hemingwai/generate_text_v3/";
 
     //데이터 종류별 API URL (fixed = 보도기사, 서비스API)
     private static final String OPEN_SRV_API = "https://open.assembly.go.kr/portal/openapi/OPENSRVAPI";
@@ -23,9 +26,9 @@ public class setting {
 
     //기능에 따라 변경해 사용
     //private static final String CHAT_BOT_MESSAGE = "시각 장애인에게 기사를 요약해 읽어주는 서비스에 사용할 것이라서 짧고 핵심적인 내용이 필요해. 다음 세 문장을 최대한 짧은 세 문장으로 요약해줘.\n";
-    private static final String CHAT_BOT_MESSAGE = "다음 기사를 핵심 내용을 포함해 짧은 세 문장으로 요약해줘.";
+    private static final String CHAT_BOT_MESSAGE = "다음 기사를 핵심 내용을 포함해 짧은 세 문장으로 요약해줘. ";
     private static String CHOSEN_API_URL = ARTICLE;
-    private static String VALUE = "&AGE=21";
+    private static String VALUE = "";
     private static boolean ARTICLE_TRUE = false;
     private static final int SUMMARY_LENGTH = 3; //3줄 요약
     private static final String LANGUAGE = "ko";
@@ -51,6 +54,10 @@ public class setting {
         return MODEL;
     }
 
+    public static String getTextCortexApiKey() {
+        return TEXT_CORTEX_API_KEY;
+    }
+
     public static void setModel(boolean is_news) {
         if (is_news){
             MODEL = "news";
@@ -66,8 +73,33 @@ public class setting {
                 "{ \"title\": \"" + title + "\", \"content\": \"" + content +"\" }, " +
                   "\"option\": { \"language\": \"" + LANGUAGE + "\", \"model\": \"" + MODEL + "\", \"summaryCount\": \"" + SUMMARY_LENGTH + "\" } }";
 
+        data = data.replace("\n", "");
+
         DATA = data;
 
+    }
+
+    public static void setCortexData(String original){
+
+        String data =
+        "{\n" +
+                "    \"template_name\": \"paraphrase\",\n" +
+                "    \"prompt\": {\n" +
+                "        \"original_sentence\": \"" + original + "\"\n" +
+                "    },\n" +
+                "    \"temperature\": 1.3,\n" +
+                "    \"token_count\": 20,\n" +
+                "    \"n_gen\": 3,\n" +
+                "    \"source_language\": \"ko\",\n" +
+                "    \"api_key\": \"" + TEXT_CORTEX_API_KEY + "\"\n" +
+                "}";
+
+        DATA = data;
+
+    }
+
+    public static String getTextCortexApiUrl() {
+        return TEXT_CORTEX_API_URL;
     }
 
     public static String getClovaSummaryApiUrl() {
@@ -155,8 +187,15 @@ public class setting {
         return OPEN_API_KEY;
     }
 
-    public static String getMyPath(){
-        return PATH;
+    public static String getMyPath(boolean isShorts){
+        //shorts
+        if (isShorts){
+            return PATH;
+        }
+        //chatbot
+        else {
+            return PATH_LANGCHAIN;
+        }
     }
 
     public static String getArticle(){
